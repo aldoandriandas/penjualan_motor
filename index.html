@@ -1,0 +1,1040 @@
+<!doctype html>
+<html
+    lang="en"
+    x-data="{ 
+    sidebarOpen: false,
+    darkMode: false,
+    searchOpen: false,
+    notificationsOpen: false,
+    userMenuOpen: false,
+    selectedPeriod: 'Day',
+    notifications: [
+        { id: 1, icon: 'user-plus', color: 'green', text: 'John Doe registered', time: '5 minutes ago', read: false },
+        { id: 2, icon: 'shopping-cart', color: 'blue', text: 'New order #12345', time: '15 minutes ago', read: false },
+        { id: 3, icon: 'edit', color: 'yellow', text: 'Product iPhone 12 updated', time: '1 hour ago', read: true },
+        { id: 4, icon: 'trash', color: 'red', text: 'User Jane Smith deleted', time: '3 hours ago', read: true }
+    ],
+    messages: [
+        { id: 1, from: 'Support Team', subject: 'New ticket assigned', time: '10 min', read: false },
+        { id: 2, from: 'Admin', subject: 'Server update completed', time: '2 hours', read: true }
+    ],
+    charts: {
+        sales: [70, 45, 90, 60, 120, 85, 55]
+    },
+    toggleNotification(id) {
+        const notif = this.notifications.find(n => n.id === id);
+        if (notif) notif.read = !notif.read;
+    },
+    markAllRead() {
+        this.notifications.forEach(n => n.read = true);
+    },
+    get unreadNotifications() {
+        return this.notifications.filter(n => !n.read).length;
+    },
+    get unreadMessages() {
+        return this.messages.filter(m => !m.read).length;
+    }
+}"
+    :class="{ 'dark': darkMode }"
+    class="bg-gray-100 dark:bg-gray-900"
+>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin LTE - Tailwind + Alpine.js</title>
+
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Alpine.js -->
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        ></script>
+        <!-- Font Awesome Icons -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <!-- Google Fonts -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            * {
+                font-family: "Inter", sans-serif;
+            }
+            [x-cloak] {
+                display: none !important;
+            }
+            .sidebar-link {
+                transition: all 0.2s;
+            }
+            .dropdown-enter-active {
+                transition: all 0.2s ease-out;
+            }
+            .dropdown-enter-from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            .dropdown-leave-to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        </style>
+    </head>
+    <body class="h-screen overflow-hidden" x-cloak>
+        <!-- Dark Mode Toggle Button (Floating) -->
+        <button
+            @click="darkMode = !darkMode"
+            class="fixed bottom-4 right-4 z-50 w-10 h-10 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all"
+        >
+            <i x-show="!darkMode" class="fa-regular fa-moon"></i>
+            <i x-show="darkMode" class="fa-regular fa-sun"></i>
+        </button>
+
+        <div class="flex h-full">
+            <!-- Mobile Sidebar Backdrop -->
+            <div
+                x-show="sidebarOpen"
+                @click="sidebarOpen = false"
+                class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden transition-opacity"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+            ></div>
+
+            <!-- Sidebar -->
+            <aside
+                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                class="fixed md:static inset-y-0 left-0 w-64 bg-[#1e1e2d] dark:bg-gray-900 text-white transform transition-transform duration-300 md:translate-x-0 z-30 overflow-y-auto flex-shrink-0"
+            >
+                <!-- Logo -->
+                <div
+                    class="flex items-center justify-between h-16 bg-[#1a1a27] dark:bg-gray-800 px-4 border-b border-gray-700"
+                >
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-cube text-xl text-blue-400"></i>
+                        <span class="text-xl font-bold"
+                            >Admin<span class="text-blue-400">LTE</span></span
+                        >
+                    </div>
+                    <button
+                        @click="sidebarOpen = false"
+                        class="md:hidden text-gray-400 hover:text-white"
+                    >
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- User Panel -->
+                <div class="p-4 border-b border-gray-700">
+                    <div class="flex items-center space-x-3">
+                        <img
+                            src="https://ui-avatars.com/api/?name=John+Doe&background=0D6EFD&color=fff&size=40"
+                            alt="User"
+                            class="w-10 h-10 rounded-full"
+                        />
+                        <div>
+                            <p class="font-medium">John Doe</p>
+                            <p class="text-xs text-gray-400">Administrator</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Menu -->
+                <nav class="p-4 space-y-1" x-data="{ activeMenu: 'dashboard' }">
+                    <!-- Header -->
+                    <p
+                        class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3"
+                    >
+                        MAIN NAVIGATION
+                    </p>
+
+                    <!-- Dashboard -->
+                    <a
+                        href="#"
+                        @click.prevent="activeMenu = 'dashboard'"
+                        :class="activeMenu === 'dashboard' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'"
+                        class="flex items-center space-x-3 px-3 py-2.5 rounded-lg transition sidebar-link"
+                    >
+                        <i class="fa-solid fa-tachometer-alt w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <!-- Components with Submenu -->
+                    <div x-data="{ open: false }">
+                        <button
+                            @click="open = !open"
+                            class="w-full flex items-center space-x-3 px-3 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition sidebar-link"
+                        >
+                            <i class="fa-solid fa-cubes w-5"></i>
+                            <span class="flex-1 text-left">Components</span>
+                            <i
+                                class="fa-solid fa-chevron-right text-xs transition-transform"
+                                :class="{ 'rotate-90': open }"
+                            ></i>
+                        </button>
+                        <div
+                            x-show="open"
+                            x-collapse
+                            class="pl-10 mt-1 space-y-1"
+                        >
+                            <a
+                                href="#"
+                                class="block px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"
+                                >User</a
+                            >
+                            <a
+                                href="#"
+                                class="block px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"
+                                >Motor</a
+                            >
+                            <a
+                                href="#"
+                                class="block px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg"
+                                >Merk</a
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Examples -->
+                    <p
+                        class="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2 px-3"
+                    >
+                        EXAMPLES
+                    </p>
+
+                    <a
+                        href="#"
+                        class="flex items-center space-x-3 px-3 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition sidebar-link"
+                    >
+                        <i class="fa-solid fa-envelope w-5"></i>
+                        <span>Mailbox</span>
+                        <span
+                            x-show="unreadMessages > 0"
+                            class="ml-auto bg-yellow-500 text-xs px-2 py-0.5 rounded-full"
+                            x-text="unreadMessages"
+                        ></span>
+                    </a>
+
+                    <a
+                        href="#"
+                        class="flex items-center space-x-3 px-3 py-2.5 text-gray-300 hover:bg-gray-800 rounded-lg transition sidebar-link"
+                    >
+                        <i class="fa-solid fa-calendar w-5"></i>
+                        <span>Calendar</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <!-- Top Navigation -->
+                <header
+                    class="bg-white dark:bg-gray-800 shadow-sm h-16 flex items-center px-4 md:px-6 justify-between border-b dark:border-gray-700"
+                >
+                    <!-- Left side -->
+                    <div class="flex items-center space-x-4">
+                        <button
+                            @click="sidebarOpen = true"
+                            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white md:hidden"
+                        >
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </button>
+
+                        <!-- Desktop Search -->
+                        <div class="relative hidden md:block">
+                            <i
+                                class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"
+                            ></i>
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                x-model="searchQuery"
+                                @input="searchOpen = true"
+                                @click.away="searchOpen = false"
+                                class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:border-blue-500 w-80 dark:bg-gray-700 dark:text-white"
+                            />
+
+                            <!-- Search Results -->
+                            <div
+                                x-show="searchOpen && searchQuery && searchQuery.length > 0"
+                                x-transition
+                                class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50"
+                            >
+                                <div class="p-2">
+                                    <div
+                                        class="text-xs text-gray-500 dark:text-gray-400 px-3 py-2"
+                                    >
+                                        Search Results
+                                    </div>
+                                    <template x-for="i in 3" :key="i">
+                                        <a
+                                            href="#"
+                                            class="flex items-center space-x-3 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                        >
+                                            <i
+                                                class="fa-solid fa-file text-gray-400"
+                                            ></i>
+                                            <span
+                                                class="text-sm dark:text-gray-300"
+                                                x-text="'Result ' + i"
+                                            ></span>
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right side -->
+                    <div class="flex items-center space-x-2 md:space-x-3">
+                        <!-- Notifications Dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button
+                                @click="open = !open"
+                                class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            >
+                                <i class="fa-regular fa-bell text-lg"></i>
+                                <span
+                                    x-show="unreadNotifications > 0"
+                                    x-text="unreadNotifications"
+                                    class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+                                ></span>
+                            </button>
+
+                            <!-- Notifications Panel -->
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50"
+                            >
+                                <div
+                                    class="p-3 border-b dark:border-gray-700 flex justify-between"
+                                >
+                                    <h3 class="font-semibold dark:text-white">
+                                        Notifications
+                                    </h3>
+                                    <button
+                                        @click="markAllRead"
+                                        class="text-xs text-blue-600 hover:text-blue-800"
+                                    >
+                                        Mark all as read
+                                    </button>
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    <template
+                                        x-for="notif in notifications"
+                                        :key="notif.id"
+                                    >
+                                        <div
+                                            @click="toggleNotification(notif.id)"
+                                            :class="{ 'bg-gray-50 dark:bg-gray-700/50': !notif.read }"
+                                            class="flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b dark:border-gray-700 last:border-0"
+                                        >
+                                            <div
+                                                :class="'w-8 h-8 bg-' + notif.color + '-100 dark:bg-' + notif.color + '-900/30 rounded-full flex items-center justify-center flex-shrink-0'"
+                                            >
+                                                <i
+                                                    :class="'fa-solid fa-' + notif.icon + ' text-' + notif.color + '-600 dark:text-' + notif.color + '-400 text-sm'"
+                                                ></i>
+                                            </div>
+                                            <div class="flex-1">
+                                                <p
+                                                    class="text-sm dark:text-gray-300"
+                                                    x-text="notif.text"
+                                                ></p>
+                                                <p
+                                                    class="text-xs text-gray-500 dark:text-gray-500"
+                                                    x-text="notif.time"
+                                                ></p>
+                                            </div>
+                                            <span
+                                                x-show="!notif.read"
+                                                class="w-2 h-2 bg-blue-500 rounded-full"
+                                            ></span>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div
+                                    class="p-3 border-t dark:border-gray-700 text-center"
+                                >
+                                    <a
+                                        href="#"
+                                        class="text-sm text-blue-600 hover:text-blue-800"
+                                        >View all</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Messages Dropdown -->
+                        <div
+                            class="relative hidden sm:block"
+                            x-data="{ open: false }"
+                        >
+                            <button
+                                @click="open = !open"
+                                class="relative p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            >
+                                <i class="fa-regular fa-envelope text-lg"></i>
+                                <span
+                                    x-show="unreadMessages > 0"
+                                    x-text="unreadMessages"
+                                    class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
+                                ></span>
+                            </button>
+
+                            <!-- Messages Panel -->
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50"
+                            >
+                                <div class="p-3 border-b dark:border-gray-700">
+                                    <h3 class="font-semibold dark:text-white">
+                                        Messages
+                                    </h3>
+                                </div>
+                                <div class="max-h-96 overflow-y-auto">
+                                    <template
+                                        x-for="msg in messages"
+                                        :key="msg.id"
+                                    >
+                                        <div
+                                            class="flex items-start space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b dark:border-gray-700 last:border-0"
+                                        >
+                                            <img
+                                                :src="'https://ui-avatars.com/api/?name=' + msg.from + '&background=random'"
+                                                class="w-8 h-8 rounded-full"
+                                            />
+                                            <div class="flex-1">
+                                                <p
+                                                    class="text-sm font-medium dark:text-white"
+                                                    x-text="msg.from"
+                                                ></p>
+                                                <p
+                                                    class="text-xs text-gray-600 dark:text-gray-400"
+                                                    x-text="msg.subject"
+                                                ></p>
+                                                <p
+                                                    class="text-xs text-gray-500 dark:text-gray-500"
+                                                    x-text="msg.time + ' ago'"
+                                                ></p>
+                                            </div>
+                                            <span
+                                                x-show="!msg.read"
+                                                class="w-2 h-2 bg-blue-500 rounded-full"
+                                            ></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Menu Dropdown -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button
+                                @click="open = !open"
+                                class="flex items-center space-x-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                            >
+                                <img
+                                    src="https://ui-avatars.com/api/?name=John+Doe&background=0D6EFD&color=fff&size=32"
+                                    alt="User"
+                                    class="w-8 h-8 rounded-full"
+                                />
+                                <span
+                                    class="text-sm font-medium hidden md:block dark:text-white"
+                                    >John Doe</span
+                                >
+                                <i
+                                    class="fa-solid fa-chevron-down text-xs hidden md:block dark:text-gray-400"
+                                ></i>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div
+                                x-show="open"
+                                @click.away="open = false"
+                                x-transition
+                                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 z-50"
+                            >
+                                <a
+                                    href="#"
+                                    class="flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <i class="fa-regular fa-user w-5"></i>
+                                    <span>Profile</span>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <i
+                                        class="fa-regular fa-credit-card w-5"
+                                    ></i>
+                                    <span>Billing</span>
+                                </a>
+                                <a
+                                    href="#"
+                                    class="flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <i class="fa-regular fa-gear w-5"></i>
+                                    <span>Settings</span>
+                                </a>
+                                <hr class="dark:border-gray-700" />
+                                <a
+                                    href="#"
+                                    class="flex items-center space-x-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                                >
+                                    <i
+                                        class="fa-regular fa-arrow-right-from-bracket w-5"
+                                    ></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Content Wrapper -->
+                <main
+                    class="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-900 p-4 md:p-6"
+                >
+                    <!-- Breadcrumb -->
+                    <div class="mb-6">
+                        <div
+                            class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400"
+                        >
+                            <a
+                                href="#"
+                                class="hover:text-blue-600 dark:hover:text-blue-400"
+                                >Home</a
+                            >
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            <span class="text-gray-400 dark:text-gray-500"
+                                >Dashboard</span
+                            >
+                        </div>
+                        <h1
+                            class="text-2xl font-semibold text-gray-800 dark:text-white mt-2"
+                        >
+                            Dashboard
+                        </h1>
+                    </div>
+
+                    <!-- Info Boxes with Alpine Counter -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+                    >
+                        <!-- Box 1 with Counter Animation -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
+                            x-data="{ count: 0 }"
+                            x-init="setTimeout(() => count = 1234, 100)"
+                        >
+                            <div class="flex">
+                                <div class="w-2/3 p-4">
+                                    <p
+                                        class="text-gray-600 dark:text-gray-400 text-sm"
+                                    >
+                                        TOTAL USERS
+                                    </p>
+                                    <h3
+                                        class="text-2xl font-bold text-gray-800 dark:text-white"
+                                        x-text="count"
+                                    ></h3>
+                                </div>
+                                <div
+                                    class="w-1/3 bg-blue-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fa-solid fa-users text-white text-3xl"
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Box 2 -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
+                            x-data="{ count: 0 }"
+                            x-init="setTimeout(() => count = 53, 200)"
+                        >
+                            <div class="flex">
+                                <div class="w-2/3 p-4">
+                                    <p
+                                        class="text-gray-600 dark:text-gray-400 text-sm"
+                                    >
+                                        NEW ORDERS
+                                    </p>
+                                    <h3
+                                        class="text-2xl font-bold text-gray-800 dark:text-white"
+                                        x-text="count"
+                                    ></h3>
+                                </div>
+                                <div
+                                    class="w-1/3 bg-green-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fa-solid fa-shopping-cart text-white text-3xl"
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Box 3 -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
+                        >
+                            <div class="flex">
+                                <div class="w-2/3 p-4">
+                                    <p
+                                        class="text-gray-600 dark:text-gray-400 text-sm"
+                                    >
+                                        BOUNCE RATE
+                                    </p>
+                                    <h3
+                                        class="text-2xl font-bold text-gray-800 dark:text-white"
+                                    >
+                                        44.5%
+                                    </h3>
+                                </div>
+                                <div
+                                    class="w-1/3 bg-yellow-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fa-solid fa-chart-line text-white text-3xl"
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Box 4 -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden"
+                        >
+                            <div class="flex">
+                                <div class="w-2/3 p-4">
+                                    <p
+                                        class="text-gray-600 dark:text-gray-400 text-sm"
+                                    >
+                                        VISITORS
+                                    </p>
+                                    <h3
+                                        class="text-2xl font-bold text-gray-800 dark:text-white"
+                                    >
+                                        2,345
+                                    </h3>
+                                </div>
+                                <div
+                                    class="w-1/3 bg-red-500 flex items-center justify-center"
+                                >
+                                    <i
+                                        class="fa-solid fa-chart-pie text-white text-3xl"
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Two Column Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Chart Card with Interactive Period -->
+                        <div
+                            class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
+                        >
+                            <div
+                                class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3"
+                            >
+                                <h3
+                                    class="font-semibold text-gray-800 dark:text-white"
+                                >
+                                    Sales Overview
+                                </h3>
+                                <div class="flex space-x-2">
+                                    <template
+                                        x-for="period in ['Day', 'Week', 'Month']"
+                                        :key="period"
+                                    >
+                                        <button
+                                            @click="selectedPeriod = period"
+                                            :class="selectedPeriod === period ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'"
+                                            class="px-3 py-1 text-xs rounded transition"
+                                            x-text="period"
+                                        ></button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Chart Bars -->
+                            <div
+                                class="h-48 flex items-end justify-between space-x-2 mt-4"
+                            >
+                                <template
+                                    x-for="(value, index) in charts.sales"
+                                    :key="index"
+                                >
+                                    <div
+                                        class="flex-1 flex flex-col items-center group"
+                                    >
+                                        <div class="relative w-full">
+                                            <div
+                                                class="w-full bg-blue-500 rounded-t transition-all duration-500 group-hover:bg-blue-600"
+                                                :style="'height: ' + (selectedPeriod === 'Day' ? value : selectedPeriod === 'Week' ? value * 0.7 : value * 0.5) + 'px'"
+                                            ></div>
+                                            <!-- Tooltip -->
+                                            <div
+                                                class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs px-2 py-1 rounded"
+                                            >
+                                                <span
+                                                    x-text="'$' + (selectedPeriod === 'Day' ? value : selectedPeriod === 'Week' ? value * 7 : value * 30) + 'k'"
+                                                ></span>
+                                            </div>
+                                        </div>
+                                        <span
+                                            class="text-xs text-gray-600 dark:text-gray-400 mt-2"
+                                            x-text="['Jan','Feb','Mar','Apr','May','Jun','Jul'][index]"
+                                        ></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity with Real-time Updates -->
+                        <div
+                            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
+                        >
+                            <div class="flex justify-between items-center mb-4">
+                                <h3
+                                    class="font-semibold text-gray-800 dark:text-white"
+                                >
+                                    Recent Activity
+                                </h3>
+                                <button
+                                    @click="notifications.unshift({
+                            id: Date.now(),
+                            icon: 'clock',
+                            color: 'blue',
+                            text: 'New activity logged',
+                            time: 'just now',
+                            read: false
+                        })"
+                                    class="text-xs text-blue-600 hover:text-blue-800"
+                                >
+                                    <i class="fa-regular fa-plus mr-1"></i>Add
+                                </button>
+                            </div>
+                            <div class="space-y-3">
+                                <template
+                                    x-for="(notif, index) in notifications.slice(0,4)"
+                                    :key="notif.id"
+                                >
+                                    <div class="flex items-start space-x-3">
+                                        <div
+                                            :class="'w-8 h-8 bg-' + notif.color + '-100 dark:bg-' + notif.color + '-900/30 rounded-full flex items-center justify-center flex-shrink-0'"
+                                        >
+                                            <i
+                                                :class="'fa-solid fa-' + notif.icon + ' text-' + notif.color + '-600 dark:text-' + notif.color + '-400 text-sm'"
+                                            ></i>
+                                        </div>
+                                        <div>
+                                            <p
+                                                class="text-sm dark:text-gray-300"
+                                                x-text="notif.text"
+                                            ></p>
+                                            <p
+                                                class="text-xs text-gray-500 dark:text-gray-500"
+                                                x-text="notif.time"
+                                            ></p>
+                                        </div>
+                                        <span
+                                            x-show="!notif.read"
+                                            class="w-2 h-2 bg-blue-500 rounded-full ml-auto"
+                                        ></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Card with Alpine Sorting -->
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6"
+                        x-data="{ 
+                    sortField: 'id', 
+                    sortDirection: 'asc',
+                    orders: [
+                        { id: 12345, product: 'iPhone 12 Pro', customer: 'John Doe', status: 'Completed', amount: 999 },
+                        { id: 12346, product: 'Samsung S21', customer: 'Jane Smith', status: 'Pending', amount: 799 },
+                        { id: 12347, product: 'MacBook Pro', customer: 'Mike Johnson', status: 'Processing', amount: 1299 },
+                        { id: 12348, product: 'iPad Air', customer: 'Sarah Wilson', status: 'Completed', amount: 599 },
+                        { id: 12349, product: 'Apple Watch', customer: 'Tom Brown', status: 'Pending', amount: 399 }
+                    ]
+                 }"
+                    >
+                        <div
+                            class="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center"
+                        >
+                            <h3
+                                class="font-semibold text-gray-800 dark:text-white"
+                            >
+                                Recent Orders
+                            </h3>
+                            <div class="flex items-center space-x-2">
+                                <span
+                                    class="text-sm text-gray-500 dark:text-gray-400"
+                                    >Sort by:</span
+                                >
+                                <select
+                                    x-model="sortField"
+                                    class="text-sm border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white p-1"
+                                >
+                                    <option value="id">ID</option>
+                                    <option value="amount">Amount</option>
+                                    <option value="customer">Customer</option>
+                                </select>
+                                <button
+                                    @click="sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'"
+                                    class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                >
+                                    <i
+                                        :class="sortDirection === 'asc' ? 'fa-solid fa-arrow-up-wide-short' : 'fa-solid fa-arrow-down-wide-short'"
+                                        class="text-gray-600 dark:text-gray-400"
+                                    ></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                        >
+                                            ID
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                        >
+                                            Product
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                        >
+                                            Customer
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                                        >
+                                            Amount
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y dark:divide-gray-700">
+                                    <template
+                                        x-for="order in orders.sort((a, b) => {
+                                let aVal = a[sortField];
+                                let bVal = b[sortField];
+                                if (typeof aVal === 'string') {
+                                    return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                                } else {
+                                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                                }
+                            })"
+                                        :key="order.id"
+                                    >
+                                        <tr
+                                            class="hover:bg-gray-50 dark:hover:bg-gray-700"
+                                        >
+                                            <td
+                                                class="px-6 py-4 text-sm dark:text-gray-300"
+                                                x-text="'#' + order.id"
+                                            ></td>
+                                            <td
+                                                class="px-6 py-4 text-sm dark:text-gray-300"
+                                                x-text="order.product"
+                                            ></td>
+                                            <td
+                                                class="px-6 py-4 text-sm dark:text-gray-300"
+                                                x-text="order.customer"
+                                            ></td>
+                                            <td class="px-6 py-4">
+                                                <span
+                                                    :class="{
+                                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400': order.status === 'Completed',
+                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400': order.status === 'Pending',
+                                            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400': order.status === 'Processing'
+                                        }"
+                                                    class="px-2 py-1 text-xs rounded-full"
+                                                    x-text="order.status"
+                                                ></span>
+                                            </td>
+                                            <td
+                                                class="px-6 py-4 text-sm dark:text-gray-300"
+                                                x-text="'$' + order.amount.toLocaleString()"
+                                            ></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div
+                            class="px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center"
+                        >
+                            <p
+                                class="text-sm text-gray-600 dark:text-gray-400"
+                                x-text="'Showing 1 to ' + orders.length + ' of ' + orders.length + ' entries'"
+                            ></p>
+                            <div class="flex space-x-2">
+                                <button
+                                    class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    class="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                                >
+                                    1
+                                </button>
+                                <button
+                                    class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    2
+                                </button>
+                                <button
+                                    class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Todo List with Alpine -->
+                    <div
+                        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4"
+                        x-data="{
+                todos: [
+                    { id: 1, text: 'Review new orders', completed: false },
+                    { id: 2, text: 'Update product inventory', completed: true },
+                    { id: 3, text: 'Reply to customer emails', completed: false },
+                    { id: 4, text: 'Generate monthly report', completed: false }
+                ],
+                newTodo: '',
+                addTodo() {
+                    if (this.newTodo.trim()) {
+                        this.todos.push({
+                            id: Date.now(),
+                            text: this.newTodo,
+                            completed: false
+                        });
+                        this.newTodo = '';
+                    }
+                },
+                toggleTodo(id) {
+                    const todo = this.todos.find(t => t.id === id);
+                    if (todo) todo.completed = !todo.completed;
+                },
+                deleteTodo(id) {
+                    this.todos = this.todos.filter(t => t.id !== id);
+                }
+            }"
+                    >
+                        <h3
+                            class="font-semibold text-gray-800 dark:text-white mb-4"
+                        >
+                            Todo List
+                        </h3>
+
+                        <!-- Add Todo -->
+                        <div class="flex space-x-2 mb-4">
+                            <input
+                                type="text"
+                                x-model="newTodo"
+                                @keyup.enter="addTodo"
+                                placeholder="Add new task..."
+                                class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                            />
+                            <button
+                                @click="addTodo"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                            >
+                                Add
+                            </button>
+                        </div>
+
+                        <!-- Todo List -->
+                        <div class="space-y-2">
+                            <template x-for="todo in todos" :key="todo.id">
+                                <div
+                                    class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg group"
+                                >
+                                    <div class="flex items-center space-x-3">
+                                        <input
+                                            type="checkbox"
+                                            :checked="todo.completed"
+                                            @change="toggleTodo(todo.id)"
+                                            class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                        />
+                                        <span
+                                            :class="{ 'line-through text-gray-400': todo.completed }"
+                                            class="text-sm dark:text-gray-300"
+                                            x-text="todo.text"
+                                        ></span>
+                                    </div>
+                                    <button
+                                        @click="deleteTodo(todo.id)"
+                                        class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition"
+                                    >
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Footer -->
+                <footer
+                    class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 py-4 px-4 md:px-6"
+                >
+                    <div
+                        class="text-sm text-gray-600 dark:text-gray-400 flex flex-col sm:flex-row justify-between items-center gap-2"
+                    >
+                        <span
+                            >&copy; 2024 AdminLTE - Tailwind + Alpine.js
+                            Version</span
+                        >
+                        <span>Version 2.0.0</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Alpine.js Plugins -->
+        <script>
+            // Collapse plugin for submenu
+            document.addEventListener("alpine:init", () => {
+                Alpine.data("collapse", () => ({
+                    open: false,
+                    toggle() {
+                        this.open = !this.open;
+                    },
+                }));
+            });
+        </script>
+    </body>
+</html>
