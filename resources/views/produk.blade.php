@@ -1,8 +1,6 @@
 @extends('layouts.main')
 
 @section('content')
-    @include('layouts.navbar')
-
     <section class="py-20 px-6 bg-gray-100 dark:bg-gray-900" id="produk">
 
         <div class="mx-auto max-w-7xl">

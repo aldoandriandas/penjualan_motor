@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/motors', [MotorController::class, 'index'])->name('motors.index');
 Route::get('/motors/{motor}', [MotorController::class, 'show'])->name('motors.show');
 Route::get('/produk', [MotorController::class, 'produk'])->name('motors.produk');
-Route::get('/search-motor', [MotorController::class, 'search'])->name('motors.search');
+// Route::get('/search-motor', [MotorController::class, 'search'])->name('motors.search');
 Route::get('/searchs-motor', [MotorController::class, 'searchs'])->name('motor.searchs');
 
 /*

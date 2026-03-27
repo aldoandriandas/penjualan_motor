@@ -252,20 +252,9 @@
                     <form action="{{ route('contact.send') }}" method="POST">
                         @csrf
                         <div class="space-y-4">
-                            <input type="text" 
-                                   name="name" 
-                                   required
-                                   placeholder="Your Name"
-                                   value="{{ old('name') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
-                            <input type="email" 
-                                   name="email" 
-                                   required
-                                   placeholder="Your Email"
-                                   value="{{ old('email') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
-                            <textarea name="message" 
-                                      rows="4" 
-                                      required
-                                      placeholder="Your Message" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">{{ old('message') }}</textarea>
+                            <input name="name" value="{{ old('name') }}" type="text" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+                            <input name="email" value="{{ old('email') }}" type="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+                            <textarea name="message" rows="4" placeholder="Your Message" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">{{ old('message') }}</textarea>
                             <button type="submit" class="w-full px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">Send Message</button>
                         </div>
                     </form>

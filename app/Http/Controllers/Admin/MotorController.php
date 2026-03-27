@@ -33,17 +33,7 @@ class MotorController extends Controller
         if ($request->jarak_tempuh) $query->where('jarak_tempuh', '<=', $request->jarak_tempuh);
         if ($request->kondisi) $query->where('kondisi', $request->kondisi);
         if ($request->warna) $query->where('warna', $request->warna);
-if ($request->tahun) {
-    $query->whereYear('tahun', $request->tahun);
-}
 
-if ($request->min_price) {
-    $query->where('price', '>=', $request->min_price);
-}
-
-if ($request->max_price) {
-    $query->where('price', '<=', $request->max_price);
-}
         if (Auth::check() && Auth::user()->role === 'admin') {
             $query->where('dealer_id', Auth::user()->dealer_id);
         }
