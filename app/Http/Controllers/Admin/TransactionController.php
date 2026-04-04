@@ -40,50 +40,62 @@ class TransactionController extends Controller
     }
 
     // Hanya admin bisa membuat transaksi
-    public function create()
-    {
-        $this->authorizeAdmin();
+public function create()
+{
+    $this->authorizeAdmin();
 
-        $merks = Merk::all();
-        $models = ModelMotor::all();
-        $motors = Motor::with(['model', 'merk'])->get();
+    $merks = Merk::all();
+    $models = ModelMotor::all();
 
-        // Dealer hanya sesuai admin login
-        $dealers = Dealer::where('id', Auth::user()->dealer_id)->get();
+    // 🔥 GABUNGKAN: hanya ambil motor yang stok > 0
+    $motors = Motor::with(['model', 'merk'])
+        ->where('stock', '>', 0)
+        ->get();
 
-        return view('admin.transaction.create', compact('merks', 'models', 'motors', 'dealers'));
+    // Dealer hanya sesuai admin login
+    $dealers = Dealer::where('id', Auth::user()->dealer_id)->get();
+
+    return view('admin.transaction.create', compact('merks', 'models', 'motors', 'dealers'));
+}
+
+public function store(Request $request)
+{
+    $this->authorizeAdmin();
+
+    $request->validate([
+        'motor_id' => 'required|exists:motors,id',
+        'dealer_id' => 'required|exists:dealers,id',
+        'payment_method' => 'required|in:transfer,cash'
+    ]);
+
+    if ($request->dealer_id != Auth::user()->dealer_id) {
+        abort(403, 'Dealer tidak sesuai dengan admin yang login.');
     }
 
-    public function store(Request $request)
-    {
-        $this->authorizeAdmin();
+    $motor = Motor::findOrFail($request->motor_id);
 
-        $request->validate([
-            'motor_id' => 'required|exists:motors,id',
-            'dealer_id' => 'required|exists:dealers,id',
-            'payment_method' => 'required|in:transfer,cash'
-        ]);
-
-        // Pastikan dealer sesuai admin login
-        if ($request->dealer_id != Auth::user()->dealer_id) {
-            abort(403, 'Dealer tidak sesuai dengan admin yang login.');
-        }
-
-        $motor = Motor::findOrFail($request->motor_id);
-
-        Transaction::create([
-            'motor_id' => $motor->id,
-            'user_id' => Auth::id(),
-            'dealer_id' => $request->dealer_id,
-            'invoice' => 'INV-' . strtoupper(Str::random(8)),
-            'total_price' => $motor->harga,
-            'status' => 'pending',
-            'payment_method' => $request->payment_method
-        ]);
-
-        return redirect()->route('admin.transaction.index')
-            ->with('success', 'Transaksi berhasil dibuat');
+    // 🔥 CEK STOCK
+    if ($motor->stock <= 0) {
+        return back()->with('error', 'Stock motor habis!');
     }
+
+    // 🔥 KURANGI STOCK
+    $motor->decrement('stock');
+
+    // 🔥 SIMPAN TRANSAKSI
+    Transaction::create([
+        'motor_id' => $motor->id,
+        'user_id' => Auth::id(),
+        'dealer_id' => $request->dealer_id,
+        'invoice' => 'INV-' . strtoupper(Str::random(8)),
+        'total_price' => $motor->harga,
+        'status' => 'pending',
+        'payment_method' => $request->payment_method
+    ]);
+
+    return redirect()->route('admin.transaction.index')
+        ->with('success', 'Transaksi berhasil dibuat');
+}
 
     // Hanya admin bisa update status
     public function updateStatus(Request $request, $id)
@@ -99,15 +111,22 @@ class TransactionController extends Controller
             ->with('success', 'Status transaksi berhasil diupdate');
     }
 
-    // Hanya admin bisa hapus transaksi
-    public function destroy($id)
-    {
-        $this->authorizeAdmin();
+public function destroy($id)
+{
+    $this->authorizeAdmin();
 
-        Transaction::destroy($id);
+    $transaction = Transaction::with('motor')->findOrFail($id);
 
-        return back()->with('success', 'Transaksi dihapus');
+    // 🔥 KEMBALIKAN STOCK
+    if ($transaction->motor) {
+        $transaction->motor->increment('stock');
     }
+
+    // 🔥 HAPUS TRANSAKSI
+    $transaction->delete();
+
+    return back()->with('success', 'Transaksi dihapus & stok dikembalikan');
+}
 
     // Fungsi private untuk cek role admin
     private function authorizeAdmin()

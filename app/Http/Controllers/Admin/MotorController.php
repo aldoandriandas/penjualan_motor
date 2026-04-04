@@ -23,29 +23,67 @@ class MotorController extends Controller
 
     // 📄 INDEX
     public function index(Request $request)
-    {
-        $query = Motor::query();
+{
+    $query = Motor::query();
 
-        if ($request->merk_id) $query->where('merk_id', $request->merk_id);
-        if ($request->model_id) $query->where('model_id', $request->model_id);
-        if ($request->tahun) $query->where('tahun', $request->tahun);
-        if ($request->harga) $query->where('harga', '<=', $request->harga);
-        if ($request->jarak_tempuh) $query->where('jarak_tempuh', '<=', $request->jarak_tempuh);
-        if ($request->kondisi) $query->where('kondisi', $request->kondisi);
-        if ($request->warna) $query->where('warna', $request->warna);
-
-        if (Auth::check() && Auth::user()->role === 'admin') {
-            $query->where('dealer_id', Auth::user()->dealer_id);
-        }
-
-        $motors = $query->latest()->get();
-        $merks  = Merk::all();
-        $models = ModelMotor::all();
-
-        return view(Auth::check() && in_array(Auth::user()->role, ['admin', 'super_admin']) 
-            ? 'admin.motor.index' 
-            : 'home', compact('motors', 'merks', 'models'));
+    // 🔹 FILTER
+    if ($request->merk_id) {
+        $query->where('merk_id', $request->merk_id);
     }
+
+    if ($request->model_id) {
+        $query->where('model_id', $request->model_id);
+    }
+
+    if ($request->tahun) {
+        $query->where('tahun', $request->tahun);
+    }
+
+    // 🔥 FILTER HARGA (MIN & MAX)
+    if ($request->harga_min && $request->harga_max) {
+        $query->whereBetween('harga', [$request->harga_min, $request->harga_max]);
+    } elseif ($request->harga_min) {
+        $query->where('harga', '>=', $request->harga_min);
+    } elseif ($request->harga_max) {
+        $query->where('harga', '<=', $request->harga_max);
+    }
+
+    // 🔹 FILTER TAMBAHAN
+    if ($request->jarak_tempuh) {
+        $query->where('jarak_tempuh', '<=', $request->jarak_tempuh);
+    }
+
+    if ($request->kondisi) {
+        $query->where('kondisi', $request->kondisi);
+    }
+
+    if ($request->warna) {
+        $query->where('warna', $request->warna);
+    }
+
+    // 🔐 KHUSUS ADMIN
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        $query->where('dealer_id', Auth::user()->dealer_id);
+    }
+
+    $motors = $query->latest()->get();
+
+    // 🔥 AMBIL YEAR DARI TABEL MOTORS
+    $years = Motor::select('tahun')
+        ->distinct()
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun');
+
+    $merks  = Merk::all();
+    $models = ModelMotor::all();
+
+    return view(
+        Auth::check() && in_array(Auth::user()->role, ['admin', 'super_admin'])
+            ? 'admin.motor.index'
+            : 'home',
+        compact('motors', 'merks', 'models', 'years')
+    );
+}
 
     // ➕ CREATE
     public function create()
@@ -74,7 +112,7 @@ class MotorController extends Controller
             'kondisi' => 'required',
             'warna' => 'required',
             'deskripsi' => 'nullable',
-            'stock' => 'required',
+            'stock' => 'required|numeric|min:0',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'gambar2' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'gambar3' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -124,7 +162,7 @@ class MotorController extends Controller
             'kondisi' => 'required',
             'warna' => 'required',
             'deskripsi' => 'nullable',
-            'stock' => 'required',
+            'stock' => 'required|numeric|min:0',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'gambar2' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'gambar3' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -174,4 +212,63 @@ class MotorController extends Controller
 
         return view('show', compact('motor','otherMotors','transaction','invoice'));
     }
+    public function searchs(Request $request)
+{
+    $query = Motor::query();
+
+    // 🔹 FILTER MERK
+    if ($request->merk) {
+        $query->where('merk_id', $request->merk);
+    }
+
+    // 🔹 FILTER MODEL
+    if ($request->model) {
+        $query->where('model_id', $request->model);
+    }
+
+    // 🔹 FILTER TAHUN
+    if ($request->tahun) {
+        $query->where('tahun', $request->tahun);
+    }
+
+    // 🔥 FILTER PRICE RANGE (sesuai select kamu)
+    if ($request->price_range) {
+        switch ($request->price_range) {
+            case 'under_10':
+                $query->where('harga', '<', 10000000);
+                break;
+
+            case '10_20':
+                $query->whereBetween('harga', [10000000, 20000000]);
+                break;
+
+            case '20_30':
+                $query->whereBetween('harga', [20000000, 30000000]);
+                break;
+
+            case 'above_30':
+                $query->where('harga', '>', 30000000);
+                break;
+        }
+    }
+
+    // 🔐 kalau admin
+    if (Auth::check() && Auth::user()->role === 'admin') {
+        $query->where('dealer_id', Auth::user()->dealer_id);
+    }
+
+    // 🔥 ambil data motor
+    $motors = $query->with('merk','model','dealer')->latest()->get();
+
+    // 🔥 ambil YEAR dari tabel motors
+    $years = Motor::select('tahun')
+        ->distinct()
+        ->orderBy('tahun', 'desc')
+        ->pluck('tahun');
+
+    $merks  = Merk::all();
+    $models = ModelMotor::all();
+
+    return view('produk', compact('motors','merks','models','years'));
+}
 }

@@ -16,7 +16,7 @@
                 @if (Auth::user()->role === 'admin')
                     <div class="sidebar-brand-text mx-3">Admin Motor</div>
                 @else
-                    <div class="sidebar-brand-text mx-3">Admin Sales</div>
+                    <div class="sidebar-brand-text mx-3">Super Admin</div>
                 @endif
             </a>
 

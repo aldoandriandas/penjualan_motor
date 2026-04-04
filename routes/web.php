@@ -5,12 +5,14 @@ use App\Http\Controllers\Admin\DealerController;
 use App\Http\Controllers\Admin\MerkController;
 use App\Http\Controllers\Admin\ModelMotorController;
 use App\Http\Controllers\Admin\MotorController;
+use App\Http\Controllers\Admin\PemasukanController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,6 +60,10 @@ Route::get('/motors/{motor}', [MotorController::class, 'show'])->name('motors.sh
 Route::get('/produk', [MotorController::class, 'produk'])->name('motors.produk');
 // Route::get('/search-motor', [MotorController::class, 'search'])->name('motors.search');
 Route::get('/searchs-motor', [MotorController::class, 'searchs'])->name('motor.searchs');
+Route::get('/get-models/{merkId}', function ($merkId) {
+    $models = \App\Models\ModelMotor::where('merk_id', $merkId)->get();
+    return response()->json($models);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -81,7 +87,14 @@ Route::prefix('admin')
 
         // DASHBOARD
         Route::get('/dashboard', function () {
-            return view('admin.dashboard');
+
+            $totalAdmin = User::where('role', 'admin')->count();
+            $totalUser = User::where('role', 'user')->count();
+
+            return view('admin.dashboard', [
+                'totalAdmin' => $totalAdmin,
+                'totalUser' => $totalUser
+            ]);
         })->name('dashboard');
 
         // CONTACT
@@ -100,9 +113,15 @@ Route::prefix('admin')
         Route::resource('merk', MerkController::class);
         Route::resource('model', ModelMotorController::class);
 
+
         // DEALER & USER
         Route::resource('dealer', DealerController::class);
         Route::resource('user', UserController::class);
+
+        // PEMASUKAN
+        Route::get('/pemasukan', [PemasukanController::class, 'index'])->name('pemasukan.index');
+        Route::get('/pemasukan/create', [PemasukanController::class, 'create'])->name('pemasukan.create');
+        Route::post('/pemasukan', [PemasukanController::class, 'store'])->name('pemasukan.store');
     });
 
 /*

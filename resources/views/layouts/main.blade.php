@@ -1,5 +1,13 @@
 @include('layouts.header')
 
-@yield('content')
+<body class="flex flex-col min-h-screen">
 
-@include('layouts.footer')
+
+    {{-- Content --}}
+    <main class="flex-grow">
+        @yield('content')
+    </main>
+
+    {{-- Footer --}}
+    @include('layouts.footer')
+</body>

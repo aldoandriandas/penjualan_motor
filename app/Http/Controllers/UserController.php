@@ -34,13 +34,15 @@ public function index()
         ")
         ->get();
 
-    // Total admin (untuk pengecekan admin terakhir)
+    // Hitung jumlah berdasarkan role
     $totalAdmin = User::where('role', 'admin')->count();
+    $totalUser = User::where('role', 'user')->count();
 
     return view('admin.user.index', [
         'title' => 'Halaman User',
         'users' => $users,
-        'totalAdmin' => $totalAdmin
+        'totalAdmin' => $totalAdmin,
+        'totalUser' => $totalUser
     ]);
 }
 

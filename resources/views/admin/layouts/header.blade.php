@@ -21,4 +21,39 @@
     <link href="{{ asset('sbadmin/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{asset('sbadmin/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet" />
 
+    <style>
+          /* Custom scrollbar for activity list */
+    .activity-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .activity-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .activity-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .activity-list::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    .transition {
+        transition: all 0.2s ease;
+    }
+    
+    .hover\:bg-gray-50:hover {
+        background-color: #f9fafb;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .activity-list {
+            max-height: 400px;
+        }
+    }
+    </style>
 </head>

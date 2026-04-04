@@ -244,8 +244,8 @@
                 </p>
 
                 <div class="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                    <span><i class="fas fa-tachometer-alt"></i> {{ $other->motor->jarak_tempuh }}</span>
-                    <span><i class="fas fa-palette"></i> {{ $other->motor->warna }}</span>
+                    <span><i class="fas fa-tachometer-alt"></i> {{ $other->jarak_tempuh }}</span>
+                    <span><i class="fas fa-palette"></i> {{ $other->warna }}</span>
                 </div>
 
                 <p class="mt-3 text-sm text-gray-500">
