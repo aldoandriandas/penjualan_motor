@@ -139,7 +139,7 @@
                                 <span class="font-semibold text-gray-800">{{ $motor->tahun }}</span>
                             </div>
                             <div class="flex justify-between items-center border-b border-gray-100 pb-2">
-                                <span class="text-gray-500">Tipo / Varian</span>
+                                <span class="text-gray-500">Tipe / Varian</span>
                                 <span class="font-semibold text-gray-800">{{ $motor->model->nama_model }} </span>
                             </div>
                             <div class="flex justify-between items-center border-b border-gray-100 pb-2">

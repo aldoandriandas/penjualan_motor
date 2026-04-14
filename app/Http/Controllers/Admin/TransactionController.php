@@ -7,6 +7,7 @@ use App\Models\Dealer;
 use App\Models\Merk;
 use App\Models\ModelMotor;
 use App\Models\Motor;
+use App\Models\CashIn;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
-    // Semua role bisa lihat transaksi
+    // 🔍 Semua role bisa lihat transaksi
     public function index()
     {
         $transactions = Transaction::with([
@@ -39,99 +40,122 @@ class TransactionController extends Controller
         return view('admin.transaction.show', compact('transaction'));
     }
 
-    // Hanya admin bisa membuat transaksi
-public function create()
-{
-    $this->authorizeAdmin();
+    // 🔐 Hanya admin
+    public function create()
+    {
+        $this->authorizeAdmin();
 
-    $merks = Merk::all();
-    $models = ModelMotor::all();
+        $merks = Merk::all();
+        $models = ModelMotor::all();
 
-    // 🔥 GABUNGKAN: hanya ambil motor yang stok > 0
-    $motors = Motor::with(['model', 'merk'])
-        ->where('stock', '>', 0)
-        ->get();
+        $motors = Motor::with(['model', 'merk'])
+            ->where('stock', '>', 0)
+            ->get();
 
-    // Dealer hanya sesuai admin login
-    $dealers = Dealer::where('id', Auth::user()->dealer_id)->get();
+        // Dealer sesuai user login
+        $dealers = Dealer::where('id', Auth::user()->dealer_id)->get();
 
-    return view('admin.transaction.create', compact('merks', 'models', 'motors', 'dealers'));
-}
-
-public function store(Request $request)
-{
-    $this->authorizeAdmin();
-
-    $request->validate([
-        'motor_id' => 'required|exists:motors,id',
-        'dealer_id' => 'required|exists:dealers,id',
-        'payment_method' => 'required|in:transfer,cash'
-    ]);
-
-    if ($request->dealer_id != Auth::user()->dealer_id) {
-        abort(403, 'Dealer tidak sesuai dengan admin yang login.');
+        return view('admin.transaction.create', compact('merks', 'models', 'motors', 'dealers'));
     }
 
-    $motor = Motor::findOrFail($request->motor_id);
+    public function store(Request $request)
+    {
+        $this->authorizeAdmin();
 
-    // 🔥 CEK STOCK
-    if ($motor->stock <= 0) {
-        return back()->with('error', 'Stock motor habis!');
+        $request->validate([
+            'motor_id' => 'required|exists:motors,id',
+            'payment_method' => 'required|in:transfer,cash'
+        ]);
+
+        $motor = Motor::findOrFail($request->motor_id);
+
+        // ❗ CEK STOCK
+        if ($motor->stock <= 0) {
+            return back()->with('error', 'Stock motor habis!');
+        }
+
+        // ❗ KURANGI STOCK
+        $motor->decrement('stock');
+
+        // ✅ SIMPAN TRANSAKSI (FIX dealer_id)
+        Transaction::create([
+            'motor_id' => $motor->id,
+            'user_id' => Auth::id(),
+            'dealer_id' => Auth::user()->dealer_id, // 🔥 FIX
+            'invoice' => 'INV-' . strtoupper(Str::random(8)),
+            'total_price' => $motor->harga,
+            'status' => 'pending',
+            'payment_method' => $request->payment_method
+        ]);
+
+        return redirect()->route('admin.transaction.index')
+            ->with('success', 'Transaksi berhasil dibuat');
     }
 
-    // 🔥 KURANGI STOCK
-    $motor->decrement('stock');
-
-    // 🔥 SIMPAN TRANSAKSI
-    Transaction::create([
-        'motor_id' => $motor->id,
-        'user_id' => Auth::id(),
-        'dealer_id' => $request->dealer_id,
-        'invoice' => 'INV-' . strtoupper(Str::random(8)),
-        'total_price' => $motor->harga,
-        'status' => 'pending',
-        'payment_method' => $request->payment_method
-    ]);
-
-    return redirect()->route('admin.transaction.index')
-        ->with('success', 'Transaksi berhasil dibuat');
-}
-
-    // Hanya admin bisa update status
+    // 🔄 UPDATE STATUS
     public function updateStatus(Request $request, $id)
     {
         $this->authorizeAdmin();
 
-        $request->validate(['status' => 'required']);
+        $request->validate([
+            'status' => 'required'
+        ]);
 
         $transaction = Transaction::findOrFail($id);
-        $transaction->update(['status' => $request->status]);
 
-        return redirect()->route('admin.transaction.index')
-            ->with('success', 'Status transaksi berhasil diupdate');
-    }
+        // 🔥 NORMALISASI
+        $status = strtolower(trim($request->status));
 
-public function destroy($id)
-{
-    $this->authorizeAdmin();
+        $transaction->status = $status;
+        $transaction->save();
 
-    $transaction = Transaction::with('motor')->findOrFail($id);
+        // =========================
+        // 🔥 JIKA SELESAI
+        // =========================
+        if ($status === 'selesai') {
 
-    // 🔥 KEMBALIKAN STOCK
-    if ($transaction->motor) {
-        $transaction->motor->increment('stock');
-    }
+            CashIn::updateOrCreate(
+                ['transaction_id' => $transaction->id], // 🔥 kunci utama
+                [
+                    'dealer_id'   => $transaction->dealer_id,
+                    'amount'      => $transaction->total_price,
+                    'description' => 'Penjualan Motor - ' . $transaction->invoice
+                ]
+            );
+        }
 
-    // 🔥 HAPUS TRANSAKSI
-    $transaction->delete();
+        // =========================
+        // ❌ JIKA DIBATALKAN
+        // =========================
+        if (in_array($status, ['pending', 'dibatalkan'])) {
 
-    return back()->with('success', 'Transaksi dihapus & stok dikembalikan');
+    CashIn::where('transaction_id', $transaction->id)->delete();
 }
 
-    // Fungsi private untuk cek role admin
+        return back()->with('success', 'Status berhasil diupdate');
+    }
+
+    // ❌ HAPUS
+    public function destroy($id)
+    {
+        $this->authorizeAdmin();
+
+        $transaction = Transaction::with('motor')->findOrFail($id);
+
+        // 🔄 BALIKIN STOCK
+        if ($transaction->motor) {
+            $transaction->motor->increment('stock');
+        }
+
+        $transaction->delete();
+
+        return back()->with('success', 'Transaksi dihapus & stok dikembalikan');
+    }
+
+    // 🔐 CEK ROLE
     private function authorizeAdmin()
     {
-        if (Auth::user()->role !== 'admin') {
+        if (!in_array(Auth::user()->role, ['admin', 'super_admin'])) {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
     }

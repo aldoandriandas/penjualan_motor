@@ -23,8 +23,8 @@
                         @if($contact->reply)
                             <hr>
                             <p><strong>Balasan Sebelumnya:</strong></p>
-                            <div class="bg-success bg-opacity-10 p-3 rounded">{{ $contact->reply }}</div>
-                            <small class="text-muted">Dibalas: {{ $contact->updated_at->format('d M Y, H:i') }}</small>
+                            <div class="bg-secondary text-white bg-opacity-10 p-3 rounded">{{ $contact->reply }}</div>
+                            <small class="text-muted ">Dibalas: {{ $contact->updated_at->format('d M Y, H:i') }}</small>
                         @endif
                     </div>
                 </div>
@@ -49,13 +49,14 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary flex-fill">
-                                    <i class="bi bi-send-fill me-1"></i> Kirim Balasan
-                                </button>
-                                <a href="{{ route('admin.contact.index') }}" class="btn btn-outline-secondary flex-fill">
+                            <div class="d-flex">
+                                 <a href="{{ route('admin.contact.index') }}" class="btn btn-outline-secondary flex-fill mx-3">
                                     <i class="bi bi-arrow-left me-1"></i> Kembali
                                 </a>
+                                <button  onclick="this.disabled=true; this.form.submit(); type="submit" class="btn btn-primary flex-fill" >
+                                    <i class="bi bi-send-fill me-1"></i> Kirim Balasan
+                                </button>
+                               
                             </div>
                         </form>
                     </div>

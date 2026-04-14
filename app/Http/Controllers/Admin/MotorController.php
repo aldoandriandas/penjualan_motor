@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\MotorExport;
 use App\Http\Controllers\Controller;
 use App\Models\Dealer;
 use App\Models\Merk;
@@ -10,6 +11,7 @@ use App\Models\Motor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MotorController extends Controller
 {
@@ -270,5 +272,18 @@ class MotorController extends Controller
     $models = ModelMotor::all();
 
     return view('produk', compact('motors','merks','models','years'));
+}
+public function excel()
+{
+    $user = Auth::user();
+
+    // admin & super_admin boleh
+    if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
+        abort(403, 'Tidak memiliki akses');
+    }
+
+    $filename = now()->format('d-m-Y_H-i-s');
+
+    return Excel::download(new MotorExport, 'DataMotor_' . $filename . '.xlsx');
 }
 }

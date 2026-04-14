@@ -105,7 +105,6 @@
                                   rows="4"
                                   class="w-full border border-gray-200 rounded-xl px-5 py-3.5 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition resize-y bg-white"
                                   placeholder="Masukkan alamat lengkap (jalan, kota, kode pos)">{{ old('alamat', $user->alamat) }}</textarea>
-                        <p class="text-xs text-gray-400 mt-1.5 ml-1">Alamat lengkap akan digunakan untuk pengiriman</p>
                     </div>
 
                     <!-- BUTTON ACTION - Lebar penuh dengan layout fleksibel -->

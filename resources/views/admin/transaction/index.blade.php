@@ -12,12 +12,12 @@
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
 
             {{-- Tombol Tambah hanya untuk admin --}}
-            @if(Auth::user()->role === 'admin')
+            @if (Auth::user()->role === 'admin')
                 <a href="{{ route('admin.transaction.create') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus mr-1"></i> Tambah Transaksi
                 </a>
             @else
-            -
+                -
             @endif
 
             <div>
@@ -34,7 +34,7 @@
         <div class="card-body">
 
             {{-- Alert --}}
-            @if(session('success'))
+            @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
@@ -50,7 +50,7 @@
                             <th>User</th>
                             <th>Total</th>
                             <th>Dealer</th>
-                            @if(Auth::user()->role === 'admin')
+                            @if (Auth::user()->role === 'admin')
                                 <th>Status</th>
                                 <th width="120">Aksi</th>
                             @else
@@ -73,26 +73,39 @@
                                 <td class="text-right">Rp {{ number_format($trx->total_price, 0, ',', '.') }}</td>
                                 <td>{{ $trx->dealer->nama_dealer ?? '-' }}</td>
 
+                                @php
+                                    $colors = [
+                                        'pending' => 'bg-warning text-dark',
+                                        // 'dibayar' => 'bg-info text-white',
+                                        // 'diproses' => 'bg-primary text-white',
+                                        'selesai' => 'bg-success text-white',
+                                        'dibatalkan' => 'bg-danger text-white',
+                                    ];
+                                @endphp
+
                                 {{-- Status hanya untuk admin --}}
-                                @if(Auth::user()->role === 'admin')
+                                @if (Auth::user()->role === 'admin')
                                     <td class="text-center">
                                         <form action="{{ route('admin.transaction.status', $trx->id) }}" method="POST">
                                             @csrf
-                                            <select name="status" class="form-control form-control-sm
-                                                @if($trx->status == 'pending') bg-warning text-dark
-                                                @elseif($trx->status == 'dibayar') bg-info text-white
-                                                @elseif($trx->status == 'diproses') bg-primary text-white
-                                                @elseif($trx->status == 'selesai') bg-success text-white
-                                                @elseif($trx->status == 'dibatalkan') bg-danger text-white
-                                                @endif
-                                            ">
-                                                <option value="pending" {{ $trx->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="dibayar" {{ $trx->status == 'dibayar' ? 'selected' : '' }}>Dibayar</option>
-                                                <option value="diproses" {{ $trx->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                                <option value="selesai" {{ $trx->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                                <option value="dibatalkan" {{ $trx->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+
+                                            <select name="status"
+                                                class="form-control form-control-sm {{ $colors[$trx->status] ?? '' }}">
+
+                                                <option value="pending" {{ $trx->status == 'pending' ? 'selected' : '' }}>
+                                                    Pending</option>
+                                                {{-- <option value="dibayar" {{ $trx->status == 'dibayar' ? 'selected' : '' }}>
+                                                    Dibayar</option>
+                                                <option value="diproses"
+                                                    {{ $trx->status == 'diproses' ? 'selected' : '' }}>Diproses</option> --}}
+                                                <option value="selesai" {{ $trx->status == 'selesai' ? 'selected' : '' }}>
+                                                    Selesai</option>
+                                                <option value="dibatalkan"
+                                                    {{ $trx->status == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan
+                                                </option>
                                             </select>
-                                            <button class="btn btn-success btn-sm mt-1">Update</button>
+
+                                            <button class="btn btn-primary btn-sm mt-1">Update</button>
                                         </form>
                                     </td>
                                 @endif
@@ -103,9 +116,10 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
 
-                                    @if(Auth::user()->role === 'admin')
+                                    @if (Auth::user()->role === 'admin')
                                         <form action="{{ route('admin.transaction.destroy', $trx->id) }}" method="POST"
-                                            class="d-inline" onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
+                                            class="d-inline"
+                                            onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-danger">
@@ -130,7 +144,7 @@
             </div>
 
             {{-- Pagination --}}
-            @if(method_exists($transactions, 'links'))
+            @if (method_exists($transactions, 'links'))
                 <div class="mt-3">{{ $transactions->links() }}</div>
             @endif
 

@@ -15,7 +15,7 @@
             <i class="fas fa-plus mr-1"></i> Tambah Dealer
         </a>
 
-        <div>
+        {{-- <div>
             <a href="#" class="btn btn-success btn-sm mr-2">
                 <i class="fas fa-file-excel mr-1"></i> Excel
             </a>
@@ -23,7 +23,7 @@
             <a href="#" class="btn btn-danger btn-sm">
                 <i class="fas fa-file-pdf mr-1"></i> PDF
             </a>
-        </div>
+        </div> --}}
 
     </div>
 

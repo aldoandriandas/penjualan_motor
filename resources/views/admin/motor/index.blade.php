@@ -9,18 +9,20 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
 
-            @if (Auth::user()->role =='admin')
+            @if (Auth::user()->role == 'admin')
                 <a href="{{ route('admin.motor.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus mr-1"></i> Tambah Motor
-            </a>
+                    <i class="fas fa-plus mr-1"></i> Tambah Motor
+                </a>
             @else
-            -
+                -
             @endif
 
             <div>
-                <a href="#" class="btn btn-success btn-sm mr-2">
-                    <i class="fas fa-file-excel mr-1"></i> Excel
-                </a>
+                @if (in_array(Auth::user()->role, ['admin', 'super_admin']))
+                    <a href="{{ route('motor.excel') }}" class="btn btn-success btn-sm mr-2">
+                        <i class="fas fa-file-excel mr-1"></i> Excel
+                    </a>
+                @endif
 
                 <a href="#" class="btn btn-danger btn-sm">
                     <i class="fas fa-file-pdf mr-1"></i> PDF
@@ -212,19 +214,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if(Auth::user()->role === 'admin')
-    <a href="{{ route('admin.motor.edit', $motor->id) }}" class="btn btn-sm btn-warning mr-1">
-        <i class="fas fa-edit"></i>
-    </a>
+                                    @if (Auth::user()->role === 'admin')
+                                        <a href="{{ route('admin.motor.edit', $motor->id) }}"
+                                            class="btn btn-sm btn-warning mr-1">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-    <form action="{{ route('admin.motor.destroy', $motor->id) }}" method="POST" class="d-inline">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn btn-sm btn-danger">
-            <i class="fas fa-trash"></i>
-        </button>
-    </form>
-@endif
+                                        <form action="{{ route('admin.motor.destroy', $motor->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

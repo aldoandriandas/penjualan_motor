@@ -2,8 +2,8 @@
 @section('content')
     <!-- Page Heading -->
     <h1 class="h3 mb-4 text-gray-800">
-        <i class="fas fa-tachometer-alt mr-2"></i>
-        Dashboard Motor
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        {{ $title }}
     </h1>
 
     <div class="row">
@@ -13,8 +13,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Penghasilan (Tahunan)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                Saldo (keseluruhan)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp {{ number_format($saldo ?? 0, 0, ',', '.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -26,8 +26,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Penghasilan (Bulanan)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                Penghasilan (Keseluruhan)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Rp {{ number_format($pendapatanBulanan ?? 0, 0, ',', '.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -39,8 +39,8 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                Penghasilan (Harian)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                Pengeluaran (Keseluruhan)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"> Rp {{ number_format($totalKeluar ?? 0, 0, ',', '.') }}</div>
                         </div>
                     </div>
                 </div>
@@ -72,6 +72,22 @@
                 </div>
             </div>
         </div>
+        <div class="col-xl-2 col-md-6 mb-4">
+    <div class="card border-left-dark shadow h-100 py-2">
+        <div class="card-body">
+            <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                    <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                        Jumlah Stock Motor
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {{ $totalStockMotor ?? 0 }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 
 
@@ -92,10 +108,11 @@
                         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                             aria-labelledby="dropdownMenuLink">
                             <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Tahunan</a>
+                            <a class="dropdown-item" href="#">Bulanan</a>
+                            <a class="dropdown-item" href="#">Harian</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="#">Semuanya</a>
                         </div>
                     </div>
                 </div>

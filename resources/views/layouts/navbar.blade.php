@@ -7,7 +7,7 @@
                 <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
                     <i class="fas fa-motorcycle text-white text-sm"></i>
                 </div>
-                <span class="text-xl font-bold text-gray-800">MotorStore</span>
+                <span class="text-xl font-bold text-gray-800">BicyStore</span>
             </a>
 
             <!-- Desktop Menu -->

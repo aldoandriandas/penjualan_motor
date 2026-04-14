@@ -5,9 +5,9 @@
                     <div class="flex items-center space-x-2 mb-4">
                         <div class="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center"><i
                                 class="fas fa-motorcycle text-white text-sm"></i></div><span
-                            class="text-lg font-bold">MotorStore</span>
+                            class="text-lg font-bold">BicyStore</span>
                     </div>
-                    <p class="text-gray-400 text-sm">Your trusted partner for quality motorcycles since 2020.</p>
+                    <p class="text-gray-400 text-sm">Mitra terpercaya Anda untuk sepeda motor berkualitas sejak tahun 2026.</p>
                 </div>
                 <div>
                     <h4 class="font-semibold mb-3">Quick Links</h4>
@@ -35,9 +35,6 @@
                             class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-teal-600 transition"><i
                                 class="fab fa-twitter text-sm"></i></a></div>
                 </div>
-            </div>
-            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400 text-sm">
-                <p>&copy; 2024 MotorStore. All rights reserved.</p>
             </div>
         </div>
     </footer>

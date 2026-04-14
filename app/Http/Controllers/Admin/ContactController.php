@@ -51,20 +51,22 @@ class ContactController extends Controller
     }
 
     // Method untuk form publik
-    public function send(Request $request)
-    {
-        $data = $request->validate([
-            'name'    => 'required|string|max:255',
-            'email'   => 'required|email',
-            'message' => 'required|string',
-        ]);
+public function send(Request $request)
+{
+    $data = $request->validate([
+        'name'    => 'required|string|max:255',
+        'email'   => 'required|email',
+        'message' => 'required|string',
+    ]);
 
-        // Simpan ke database
-        $contact = Contact::create($data);
+    // Simpan ke database
+    Contact::create($data);
 
-        // Kirim email ke toko
-        Mail::to('brodehoi@gmail.com')->send(new ContactMail($data));
+    // Kirim email ke toko
+    Mail::to('brodehoi@gmail.com')->send(new ContactMail($data));
 
-        return back()->with('success', 'Pesan Anda berhasil dikirim!');
-    }
+    // ✅ PENTING: pakai redirect, bukan back()
+    return redirect()->route('contact') // sesuaikan dengan route form kamu
+        ->with('success', 'Pesan Anda berhasil dikirim!');
+}
 }

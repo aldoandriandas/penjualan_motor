@@ -93,7 +93,7 @@
                             <i class="fas fa-envelope mr-1 text-teal-500"></i> Alamat Email
                         </label>
                         <div class="relative">
-                            <input type="email" name="email"
+                            <input type="email" name="email" 
                                 class="w-full px-5 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition"
                                 placeholder="you@example.com" required>
                             <i

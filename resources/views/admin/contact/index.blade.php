@@ -42,7 +42,7 @@
                                 <td>
                                     <a href="{{ route('admin.contacts.show', $contact->id) }}" 
                                        class="btn btn-sm btn-info mr-1">
-                                        <i class="fas fa-eye"></i> Detail & Balas
+                                        <i class="fas fa-eye"></i> & <i class="bi bi-send-fill me-1"></i> 
                                     </a>
                                 </td>
                             </tr>

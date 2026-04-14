@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\CashInController;
+use App\Http\Controllers\Admin\CashOutController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DealerController;
 use App\Http\Controllers\Admin\MerkController;
 use App\Http\Controllers\Admin\ModelMotorController;
 use App\Http\Controllers\Admin\MotorController;
-use App\Http\Controllers\Admin\PemasukanController;
+use App\Http\Controllers\Admin\TestimoniController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -64,6 +67,14 @@ Route::get('/get-models/{merkId}', function ($merkId) {
     $models = \App\Models\ModelMotor::where('merk_id', $merkId)->get();
     return response()->json($models);
 });
+Route::get('/user/excel', [UserController::class, 'excel'])->name('user.excel');
+Route::get('/motor/excel', [MotorController::class, 'excel'])
+    ->name('motor.excel');
+
+Route::resource('motor', MotorController::class);
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +108,10 @@ Route::prefix('admin')
             ]);
         })->name('dashboard');
 
+        // DASHBOARD
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
         // CONTACT
         Route::get('/contacts', [ContactController::class, 'index'])->name('contact.index');
         Route::get('/contacts/{id}', [ContactController::class, 'show'])->name('contacts.show');
@@ -104,8 +119,8 @@ Route::prefix('admin')
 
         // TRANSACTIONS
         Route::resource('transaction', TransactionController::class)->except(['edit', 'update']);
-        Route::post('/transaction/status/{id}', [TransactionController::class, 'updateStatus'])->name('transaction.status');
-
+        Route::post('/transaction/status/{id}', [TransactionController::class, 'updateStatus'])
+            ->name('transaction.status');
         // MOTOR
         Route::resource('motor', MotorController::class);
 
@@ -118,10 +133,19 @@ Route::prefix('admin')
         Route::resource('dealer', DealerController::class);
         Route::resource('user', UserController::class);
 
-        // PEMASUKAN
-        Route::get('/pemasukan', [PemasukanController::class, 'index'])->name('pemasukan.index');
-        Route::get('/pemasukan/create', [PemasukanController::class, 'create'])->name('pemasukan.create');
-        Route::post('/pemasukan', [PemasukanController::class, 'store'])->name('pemasukan.store');
+        // CASH IN OUT
+        Route::resource('cash_in', CashInController::class)->only(['index']);
+        Route::resource('cash_in', CashInController::class)
+            ->only(['index', 'store']);
+        Route::resource('cash_out', CashOutController::class)->only(['index', 'store']);
+
+        // TESTIMONI
+        Route::get('/testimoni', [TestimoniController::class, 'index'])->name('testimoni.index');
+    Route::get('/testimoni/create', [TestimoniController::class, 'create'])->name('testimoni.create');
+    Route::post('/testimoni', [TestimoniController::class, 'store'])->name('testimoni.store');
+    Route::delete('/testimoni/{id}', [TestimoniController::class, 'destroy'])->name('testimoni.destroy');
+
+
     });
 
 /*

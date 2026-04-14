@@ -15,21 +15,21 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
             <div class="text-center text-white">
                 <h1 class="text-4xl md:text-5xl font-bold mb-4">
-                    Find Your Dream
-                    <span class="text-teal-400">Motorcycle</span>
+                    Temukan
+                    <span class="text-teal-400">Motor</span>
+                    Impian Anda!    
                 </h1>
                 <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Discover the perfect ride that matches your style and personality. Quality motorcycles from world-class
-                    manufacturers.
+                    Temukan perjalanan sempurna yang sesuai dengan gaya dan kepribadian Anda. Sepeda motor berkualitas se-Indonesia disini.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
                     <a href="#search"
                         class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition inline-block">
-                        Explore Now
+                        Jelajahi
                     </a>
                     <a href="#products"
                         class="px-6 py-3 border border-white text-white rounded-lg hover:bg-white/10 transition inline-block">
-                        View Products
+                        Lihat Produk
                     </a>
                 </div>
             </div>
@@ -41,63 +41,70 @@
         <form action="{{ route('motor.searchs') }}" method="GET">\
             @csrf
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Find Your Perfect Match</h2>
-                <p class="text-gray-600">Use our filters to find the motorcycle that suits you best</p>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Brand</label>
-                        <select name="merk" id="merkSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required oninvalid="this.setCustomValidity('Masukan merk')" oninput="this.setCustomValidity('')">
-                            <option value="">All Merk</option>
-                            @foreach ($merks as $merk)
-                                <option value="{{ $merk->id }}">{{ $merk->nama_merk }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
-                        <select name="model" id="modelSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                            disabled>
-                            <option value="">Pilih merk dulu</option>
-                        </select>
-                    </div>
-
-                    {{-- Year --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
-                        <select id="yearSelect" name="tahun"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg 
-               focus:ring-2 focus:ring-teal-500 focus:border-transparent" required oninvalid="this.setCustomValidity('Masukan Tahun')" oninput="this.setCustomValidity('')">
-                            <option value="">All Years</option>
-                        </select>
-                    </div>
-
-                    {{-- Price --}}
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-                        <select id="priceSelect" name="price_range"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg 
-               focus:ring-2 focus:ring-teal-500 focus:border-transparent" required oninvalid="this.setCustomValidity('Sesuaikan Harga')" oninput="this.setCustomValidity('')">
-                            <option value="">All Prices</option>
-                            <option value="under_10">Under 10jt</option>
-                            <option value="10_20">10jt - 20jt</option>
-                            <option value="20_30">20jt - 30jt</option>
-                            <option value="above_30">Above 30jt</option>
-                        </select>
-                    </div>
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Temukan motor yang anda suka</h2>
+                    <p class="text-gray-600">Disini pasti menyediakan yang bagus dan sesuai budget anda.</p>
                 </div>
 
-                <div class="mt-6 text-center">
-                    <button type="submit" class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
-                        <i class="fas fa-search mr-2"></i>Search Motorcycles
-                    </button>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Merk</label>
+                            <select name="merk" id="merkSelect"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg" required
+                                oninvalid="this.setCustomValidity('Masukan merk')" oninput="this.setCustomValidity('')">
+                                <option value="">Semua Merk</option>
+                                @foreach ($merks as $merk)
+                                    <option value="{{ $merk->id }}">{{ $merk->nama_merk }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                            <select name="model" id="modelSelect"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg" disabled>
+                                <option value="">Pilih merk dulu</option>
+                            </select>
+                        </div>
+
+                        {{-- Year --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
+                            <select id="yearSelect" name="tahun"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg 
+               focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                required oninvalid="this.setCustomValidity('Masukan Tahun')"
+                                oninput="this.setCustomValidity('')">
+                                <option value="">Pilih Tahun</option>
+                            </select>
+                        </div>
+
+                        {{-- Price --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kisaran Harga</label>
+                            <select id="priceSelect" name="price_range"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg 
+               focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                required oninvalid="this.setCustomValidity('Sesuaikan Harga')"
+                                oninput="this.setCustomValidity('')">
+                                <option value="">Harga</option>
+                                <option value="under_10">Dibawah 10jt</option>
+                                <option value="10_20">10jt - 20jt</option>
+                                <option value="20_30">20jt - 30jt</option>
+                                <option value="above_30">Diatas 30jt</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button type="submit"
+                            class="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
+                            <i class="fas fa-search mr-2"></i>Cari Motor
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
         </form>
     </section>
 
@@ -105,8 +112,16 @@
     <section id="products" class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Featured Motorcycles</h2>
-                <p class="text-gray-600">Explore our collection of premium motorcycles</p>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Motor Impian Anda</h2>
+                <p class="text-gray-600">Temukan Motor terbaik yang anda suka</p>
+            </div>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-teal-600">
+                     {{ $totalMotor }} <span class="text-gray-800 text-2xl"> Motor Bekas</span>
+                </h2>
+                <p class="text-gray-600 mt-2">
+                    Tersedia untuk dibeli
+                </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -151,67 +166,115 @@
     <!-- ================= TESTIMONIALS SECTION ================= -->
     <section id="testimonials" class="py-16 bg-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            {{-- TITLE --}}
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">What Our Customers Say</h2>
-                <p class="text-gray-600">Trusted by thousands of satisfied customers</p>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                    Testimoni Pelanggan
+                </h2>
+                <p class="text-gray-600">
+                    Beberapa pelanggan kami memberikan ulasan.
+                </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center mb-4">
-                        <div
-                            class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                            AF</div>
-                        <div class="ml-3">
-                            <h4 class="font-semibold text-gray-800">Ahmad Fauzi</h4>
-                            <div class="text-yellow-400 text-sm"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+            {{-- WRAPPER --}}
+            <div class="overflow-hidden relative">
+
+                {{-- SLIDER --}}
+                <div id="slider" class="flex gap-6 transition-transform duration-700 ease-linear">
+
+                    {{-- CLONE DEPAN --}}
+                    @foreach ($testimonis as $t)
+                        <div class="card min-w-[300px] max-w-[300px] bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center mb-4">
+                                <div
+                                    class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                                    {{ strtoupper(substr($t->nama, 0, 1)) }}
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="font-semibold">{{ $t->nama }}</h4>
+                                    <p class="text-sm text-gray-500">{{ $t->email }}</p>
+                                </div>
+                            </div>
+                            <p>"{{ $t->pesan }}"</p>
                         </div>
-                    </div>
-                    <p class="text-gray-600 italic">"Amazing service! The motorcycle arrived in perfect condition. Highly
-                        recommended!"</p>
+                    @endforeach
+
+                    {{-- DATA ASLI --}}
+                    @foreach ($testimonis as $t)
+                        <div class="card min-w-[300px] max-w-[300px] bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center mb-4">
+                                <div
+                                    class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                                    {{ strtoupper(substr($t->nama, 0, 1)) }}
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="font-semibold">{{ $t->nama }}</h4>
+                                    <p class="text-sm text-gray-500">{{ $t->email }}</p>
+                                </div>
+                            </div>
+                            <p>"{{ $t->pesan }}"</p>
+                        </div>
+                    @endforeach
+
+                    {{-- CLONE BELAKANG --}}
+                    @foreach ($testimonis as $t)
+                        <div class="card min-w-[300px] max-w-[300px] bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center mb-4">
+                                <div
+                                    class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold">
+                                    {{ strtoupper(substr($t->nama, 0, 1)) }}
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="font-semibold">{{ $t->nama }}</h4>
+                                    <p class="text-sm text-gray-500">{{ $t->email }}</p>
+                                </div>
+                            </div>
+                            <p>"{{ $t->pesan }}"</p>
+                        </div>
+                    @endforeach
+
                 </div>
 
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center mb-4">
-                        <div
-                            class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                            SN</div>
-                        <div class="ml-3">
-                            <h4 class="font-semibold text-gray-800">Siti Nurhaliza</h4>
-                            <div class="text-yellow-400 text-sm"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star-half-alt"></i></div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic">"Very professional team. They helped me choose the perfect motorcycle
-                        for my needs."</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center mb-4">
-                        <div
-                            class="w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                            BS</div>
-                        <div class="ml-3">
-                            <h4 class="font-semibold text-gray-800">Budi Santoso</h4>
-                            <div class="text-yellow-400 text-sm"><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                    class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        </div>
-                    </div>
-                    <p class="text-gray-600 italic">"Fast delivery and great after-sales support. Will definitely buy
-                        again!"</p>
-                </div>
             </div>
+
         </div>
     </section>
+
+    <script>
+        const slider = document.getElementById('slider');
+        const cardWidth = 320;
+        const total = slider.children.length / 3; // karena clone 3x
+        let index = total; // mulai dari tengah
+
+        // posisi awal (tengah)
+        slider.style.transform = `translateX(-${index * cardWidth}px)`;
+
+        function autoSlide() {
+            index++;
+
+            slider.style.transition = "transform 0.7s linear";
+            slider.style.transform = `translateX(-${index * cardWidth}px)`;
+
+            // RESET TANPA JEDA
+            if (index >= total * 2) {
+                setTimeout(() => {
+                    slider.style.transition = "none";
+                    index = total;
+                    slider.style.transform = `translateX(-${index * cardWidth}px)`;
+                }, 700);
+            }
+        }
+
+        setInterval(autoSlide, 2500);
+    </script>
 
     <!-- ================= FAQ SECTION ================= -->
     <section id="faq" class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Frequently Asked Questions</h2>
-                <p class="text-gray-600">Find answers to common questions about our motorcycles and services</p>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Tanya Jawab BicyStore</h2>
+                <p class="text-gray-600">Saya akan menjawab pertanyaan yang mungkin sering anda Tanyakan!</p>
             </div>
 
             <div class="max-w-3xl mx-auto">
@@ -291,7 +354,7 @@
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center"><i
                                     class="fas fa-map-marker-alt text-teal-600"></i></div><span
-                                class="text-gray-600">Jakarta, Indonesia</span>
+                                class="text-gray-600"><a href="https://maps.app.goo.gl/vuCFNZNqytPo4cdj9" target="_blank">Padang, Indonesia</a></span>
                         </div>
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center"><i
@@ -301,7 +364,7 @@
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center"><i
                                     class="fas fa-envelope text-teal-600"></i></div><span
-                                class="text-gray-600">info@motorstore.com</span>
+                                class="text-gray-600">contact@bicystore.com</span>
                         </div>
                     </div>
                 </div>
